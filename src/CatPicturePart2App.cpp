@@ -37,7 +37,7 @@ class CatPicturePart2App : public AppBasic {
 	//Screen dimensions
 	static const int kAppWidth= 800;
 	static const int kAppHeight= 600;
-	static const int kTextureSize=1024;
+	static const int kTextureSize= 1024;
 
 	
 	uint8_t* my_blur_pattern_;
@@ -55,9 +55,15 @@ class CatPicturePart2App : public AppBasic {
 
 
 
-void CatPicturePart2App::prepareSettings(Settings* settings){
+void CatPicturePart2App::prepareSettings(Settings* settings)
+{
 	(*settings).setWindowSize(kAppWidth,kAppHeight);
 	(*settings).setResizable(true);
+}
+
+void CatPicturePart2App::drawCircles(uint8_t* pixels, int x, int y, int r)
+{
+
 }
 
 void CatPicturePart2App::drawRectangles(uint8_t* pixels, int x1, int y1, int x2, int y2)
@@ -83,12 +89,14 @@ void CatPicturePart2App::drawRectangles(uint8_t* pixels, int x1, int y1, int x2,
 	if(endy >= kAppHeight) endy = kAppHeight-1;
 	
 	//making the rectangle
-	for ( int y=10; y <= endy; y++){		
-		for ( int x = 20; x <= endx; x++) {	
+	for ( int y=starty; y <= endy; y++){		
+		for ( int x = startx; x <= endx; x++) {	
+			if (x >= startx & x <= endx & y >= starty & y <= endy){
 			//Set the Red, Green, Blue values for each pixel
-				pixels [3* (x+y*endx)]=20;			
-				pixels [3* (x+y*endx)+1]=40;			
-				pixels [3* (x+y*endx)+2]=30;					
+				pixels [3* (x+y*kTextureSize)]=250;			
+				pixels [3* (x+y*kTextureSize)+1]=150;			
+				pixels [3* (x+y*kTextureSize)+2]=50;			
+			}
 		}		
 	}
 }
@@ -107,8 +115,8 @@ void CatPicturePart2App::setup()
 
 }
 
-void CatPicturePart2App::drawBackground(uint8_t* pixels){
-
+void CatPicturePart2App::drawBackground(uint8_t* pixels)
+{
 	///I liked what you did in class, but I wanted my color transitions to be smoother
 	///So I made the colors bounce between the values of 0.0 - 1.0
 	if (red > 1.0f || red < 0.0f) {
@@ -141,8 +149,9 @@ void CatPicturePart2App::mouseDown( MouseEvent event )
 void CatPicturePart2App::update()
 {
 	uint8_t* dataArray = (*mySurface_).getData();
-	//drawRectangles(dataArray, 700, 700, 500, 500);
-	drawBackground(dataArray);
+	drawRectangles(dataArray, 250, 250, 300, 500);
+	drawCircles(dataArray, 500, 500, 500);
+	//drawBackground(dataArray);
 
 }
 
