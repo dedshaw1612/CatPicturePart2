@@ -4,6 +4,14 @@
 #include "cinder/ImageIo.h"
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "Resources.h"
+ 
+//My goal for this assignment is to incorporate my part 1 assignment into this one
+//By doing so, I wish to have animated all of the pixels on the screen and have them change
+//colors if they are within certain bounds. 
+
+
+//As I run my program now, all I get is a black screen.
+
 
 using namespace ci;
 using namespace ci::app;
@@ -15,8 +23,14 @@ class CatPicturePart2App : public AppBasic {
 	void mouseDown( MouseEvent event );	
 	void update();
 	void draw();
+	void prepareSettings (Settings* settings);
 
   private:
+
+	 float red, green, blue;
+	 ///These signs will change the direction of the color change (+/-)
+	 int redSign, greenSign, blueSign;
+
 	  //The surface I will be using on which to draw
 	Surface* mySurface_;
 
@@ -25,23 +39,99 @@ class CatPicturePart2App : public AppBasic {
 	static const int kAppHeight= 600;
 	static const int kTextureSize=1024;
 
+	
 	uint8_t* my_blur_pattern_;
 
 	//Filling a rectangle that will change colors
-	void drawRectangles(uint8_t* pixels, int x, int y, Color8u c);
+	void drawRectangles(uint8_t* pixels, int x1, int y1, int x2, int y2);
 
+	void drawCircles(uint8_t* pixels, int x1, int y1, int r);
+
+	void drawLine(uint8_t* pixels, int x1, int y1);
+
+	void drawBackground(uint8_t* pixels);
 
 };
+
+
+
+void CatPicturePart2App::prepareSettings(Settings* settings){
+	(*settings).setWindowSize(kAppWidth,kAppHeight);
+	(*settings).setResizable(true);
+}
+
+void CatPicturePart2App::drawRectangles(uint8_t* pixels, int x1, int y1, int x2, int y2)
+{
+	//--------------------------------------------------
+	//Copied from Dr. Brinkman
+	//If x1 is less than x2, take x1, else take x2
+	int startx = (x1 < x2) ? x1 : x2;
+	int endx = (x1 < x2) ? x2 : x1;
+	//Same thing for the y values
+	int starty = (y1 < y2) ? y1 : y2;
+	int endy = (y1 < y2) ? y2 : y1;
+	//--------------------------------------------------
+
+	
+	//checking the boundary 
+	if(endx < 0) return; 
+	if(endy < 0) return; 
+	if(startx >= kAppWidth) return;
+	if(starty >= kAppHeight) return;
+	//Making sure the rectangle drawn isn't outside the viewing box
+	if(endx >= kAppWidth) endx = kAppWidth-1;
+	if(endy >= kAppHeight) endy = kAppHeight-1;
+	
+	//making the rectangle
+	for ( int y=10; y <= endy; y++){		
+		for ( int x = 20; x <= endx; x++) {	
+			//Set the Red, Green, Blue values for each pixel
+				pixels [3* (x+y*endx)]=20;			
+				pixels [3* (x+y*endx)+1]=40;			
+				pixels [3* (x+y*endx)+2]=30;					
+		}		
+	}
+}
 
 void CatPicturePart2App::setup()
 {
 	mySurface_ = new Surface(kTextureSize,kTextureSize,false);
 
+	//Set the initial values of the colors and color sign values
+	red = 0.0f;
+	green = 0.5f;
+	blue = 1.0f;
+	redSign = 1;
+	greenSign = 1;
+	blueSign = 1;
+
 }
 
+void CatPicturePart2App::drawBackground(uint8_t* pixels){
 
-void CatPicturePart2App::drawRectangles(uint8_t* pixels, int x, int y, Color8u c)
-{
+	///I liked what you did in class, but I wanted my color transitions to be smoother
+	///So I made the colors bounce between the values of 0.0 - 1.0
+	if (red > 1.0f || red < 0.0f) {
+		redSign = redSign*-1;
+	}
+	if (green > 1.0f || green < 0.0f) {
+		greenSign = greenSign*-1;
+	}
+	if (blue > 1.0f || blue < 0.0f) {
+		blueSign = blueSign*-1;
+	}
+
+	///Regardless of whether _Sign is (+/-) we will add it to the current values
+	red = red + (redSign*0.01f);
+	green = green + (greenSign*0.01f);
+	blue = blue + (blueSign*0.01f);
+
+	//I want to set the color of every pixel on the screen
+	for (int i = 0; i < 01024*1024*3; i+= 3) {
+		pixels[i] = red;
+		pixels[i+1] = green;
+		pixels[i+2] = blue;
+	}
 }
 
 void CatPicturePart2App::mouseDown( MouseEvent event )
@@ -51,12 +141,18 @@ void CatPicturePart2App::mouseDown( MouseEvent event )
 void CatPicturePart2App::update()
 {
 	uint8_t* dataArray = (*mySurface_).getData();
-	drawRectangles(dataArray, 800, 600, Color8u(255,0,0));
+	//drawRectangles(dataArray, 700, 700, 500, 500);
+	drawBackground(dataArray);
+
 }
 
 void CatPicturePart2App::draw()
 {
+	//Clear the surface
+	//gl::clear(Color(red, green, blue));
 	//Draw the surface
+
+	//Im struggling writing this so that my pixels change in the surface, and not when I clear the surface
 	gl::draw(*mySurface_); 
 }
 
