@@ -32,6 +32,12 @@ class CatPicturePart2App : public AppBasic {
 	  //The surface I will be using on which to draw
 	Surface* mySurface_;
 
+	//Struct for rectangle gradient
+	struct rect_grad{
+		int line;
+
+	};
+
 	//Screen dimensions
 	static const int kAppWidth= 800;
 	static const int kAppHeight= 600;
@@ -129,6 +135,11 @@ void CatPicturePart2App::drawBackground(uint8_t* pixels, int x, int y, int r)
 
 void CatPicturePart2App::drawRectangles(uint8_t* pixels, int x1, int y1, int x2, int y2)
 {
+
+	//call the struct made above
+	rect_grad grad;
+	grad.line = 0;
+
 	//--------------------------------------------------
 	//Copied from Dr. Brinkman
 	//If x1 is less than x2, take x1, else take x2
@@ -150,13 +161,14 @@ void CatPicturePart2App::drawRectangles(uint8_t* pixels, int x1, int y1, int x2,
 	if(endy >= kAppHeight) endy = kAppHeight-1;
 	
 	//making the rectangle
-	for ( int y=starty; y <= endy; y++){		
-		for ( int x = startx; x <= endx; x++) {	
+	for ( int y=starty; y <= endy; y++){
+		grad.line++;
+		for ( int x = startx; x <= endx; x++) {
 			if (x >= startx & x <= endx & y >= starty & y <= endy){
 			//Set the Red, Green, Blue values for each pixel
-				pixels [3* (x+y*kTextureSize)]=250;			
-				pixels [3* (x+y*kTextureSize)+1]=150;			
-				pixels [3* (x+y*kTextureSize)+2]=50;			
+				pixels [3* (x+y*kTextureSize)]=(250*(grad.line*x/endx));			
+				pixels [3* (x+y*kTextureSize)+1]=(50*(grad.line*x/endx));			
+				pixels [3* (x+y*kTextureSize)+2]=(75*(grad.line*x/endx));			
 			}
 		}		
 	}
@@ -167,9 +179,9 @@ void CatPicturePart2App::setup()
 	mySurface_ = new Surface(kTextureSize,kTextureSize,false);
 
 	//Set the initial values of the colors and color sign values
-	red = 25;
-	green = 155;
-	blue = 155;
+	red = 250;
+	green = 50;
+	blue = 75;
 	redSign = 1;
 	greenSign = 1;
 	blueSign = 1;
@@ -179,15 +191,13 @@ void CatPicturePart2App::setup()
 void CatPicturePart2App::drawCircles(uint8_t* pixels, int centerX, int centerY, int radius)
 {
 
-
-
 	//Taken from Dr. Brinkmans Circle Funtion, except for the modulus portion of it
-
 
 	for ( int y=centerY-radius; y <= centerY+radius; y++){		
 		for ( int x = centerX-radius; x <= centerX+radius; x++) {	
 			int dist = (int)sqrt((double)((x-centerX)*(x-centerX) + (y-centerY)*(y-centerY)));
 			if (dist <= radius) {
+				//I'm using the values I have stored above to be able to change the circle's color
 				pixels[3*(x + y*kTextureSize)] = green;
 				pixels[(3*(x + y*kTextureSize))+1] = blue;
 				pixels[(3*(x + y*kTextureSize))+2] = red;
@@ -198,6 +208,18 @@ void CatPicturePart2App::drawCircles(uint8_t* pixels, int centerX, int centerY, 
 
 void CatPicturePart2App::mouseDown( MouseEvent event )
 {
+	//Try and switch the direction of change for the background and the circle
+	//I'm getting an error that I can't figure out:
+	//---------------------------------------------------------
+	//The variable 'c' is being used without being initialized.
+	//---------------------------------------------------------
+
+	/*
+	circle_signs c;
+	c.redSign*= -1;
+	c.greenSign = 1;
+	c.blueSign = 1;
+	*/
 
 }
 
@@ -210,7 +232,7 @@ void CatPicturePart2App::update()
 	drawBackground(dataArray, 100, 200, 10);
 
 	//Call rectangle
-	drawRectangles(dataArray, 250, 250, 300, 500);
+	drawRectangles(dataArray, 250, 250, 600, 600);
 
 	//Call circle
 	drawCircles(dataArray, 400, 100, 100);
@@ -222,7 +244,7 @@ void CatPicturePart2App::draw()
 	//gl::clear(Color(red, green, blue));
 	//Draw the surface
 
-	//Im struggling writing this so that my pixels change in the surface, and not when I clear the surface
+	//I'm struggling writing this so that my pixels change in the surface, and not when I clear the surface
 	gl::draw(*mySurface_); 
 }
 
