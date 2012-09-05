@@ -37,6 +37,11 @@ class CatPicturePart2App : public AppBasic {
 	static const int kAppHeight= 600;
 	static const int kTextureSize= 1024;
 
+	//Struct for moving circle
+	struct circle_moving{
+		int x;
+	};
+
 	//Made for smoother color changes
 	struct circle_signs{
 		int redSign;
@@ -174,6 +179,8 @@ void CatPicturePart2App::setup()
 void CatPicturePart2App::drawCircles(uint8_t* pixels, int centerX, int centerY, int radius)
 {
 
+
+
 	//Taken from Dr. Brinkmans Circle Funtion, except for the modulus portion of it
 
 
@@ -196,11 +203,17 @@ void CatPicturePart2App::mouseDown( MouseEvent event )
 
 void CatPicturePart2App::update()
 {
+	//Gather the info we need in an array
 	uint8_t* dataArray = (*mySurface_).getData();
+
+	//Call background
 	drawBackground(dataArray, 100, 200, 10);
-	//drawBackground(dataArray);
+
+	//Call rectangle
 	drawRectangles(dataArray, 250, 250, 300, 500);
-	drawCircles(dataArray, 100, 100, 100);
+
+	//Call circle
+	drawCircles(dataArray, 400, 100, 100);
 }
 
 void CatPicturePart2App::draw()
