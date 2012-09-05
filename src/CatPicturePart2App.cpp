@@ -9,9 +9,7 @@
 //By doing so, I wish to have animated all of the pixels on the screen and have them change
 //colors if they are within certain bounds. 
 
-
 //As I run my program now, all I get is a black screen.
-
 
 using namespace ci;
 using namespace ci::app;
@@ -39,7 +37,6 @@ class CatPicturePart2App : public AppBasic {
 	static const int kAppHeight= 600;
 	static const int kTextureSize= 1024;
 
-
 	//Made for smoother color changes
 	struct circle_signs{
 		int redSign;
@@ -62,11 +59,9 @@ class CatPicturePart2App : public AppBasic {
 
 	void drawLine(uint8_t* pixels, int x1, int y1);
 
-	void drawCircles(uint8_t* pixels);
+	void drawCircles(uint8_t* pixels, int center_x, int center_y, int radius);
 
 };
-
-
 
 void CatPicturePart2App::prepareSettings(Settings* settings)
 {
@@ -74,6 +69,8 @@ void CatPicturePart2App::prepareSettings(Settings* settings)
 	(*settings).setResizable(true);
 }
 
+//So far, I haven't figured out what changed my background, but
+//this really made it look goofy
 void CatPicturePart2App::drawBackground(uint8_t* pixels, int x, int y, int r)
 {
 	//Using these stucts causes the color changes in my background
@@ -114,8 +111,8 @@ void CatPicturePart2App::drawBackground(uint8_t* pixels, int x, int y, int r)
 	green = green + (greenSign);
 	blue = blue + (blueSign);
 
-
 	for (int i = 0; i < 3*kTextureSize*kTextureSize; i+= 3){
+		//something is wrong with this as it was originally intended to be my circle method...
 		int distance = (((i-x)*(i-x))+((i-y)*(i-y)));
 		if (distance <= r){
 			pixels[i] = red;
@@ -174,30 +171,21 @@ void CatPicturePart2App::setup()
 
 }
 
-void CatPicturePart2App::drawCircles(uint8_t* pixels)
+void CatPicturePart2App::drawCircles(uint8_t* pixels, int centerX, int centerY, int radius)
 {
-	///I liked what you did in class, but I wanted my color transitions to be smoother
-	///So I made the colors bounce between the values of 0.0 - 1.0
-	if (red > 1.0f || red < 0.0f) {
-		redSign = redSign*-1;
-	}
-	if (green > 1.0f || green < 0.0f) {
-		greenSign = greenSign*-1;
-	}
-	if (blue > 1.0f || blue < 0.0f) {
-		blueSign = blueSign*-1;
-	}
 
-	///Regardless of whether _Sign is (+/-) we will add it to the current values
-	red = red + (redSign*0.01f);
-	green = green + (greenSign*0.01f);
-	blue = blue + (blueSign*0.01f);
+	//Taken from Dr. Brinkmans Circle Funtion, except for the modulus portion of it
 
-	//I want to set the color of every pixel on the screen
-	for (int i = 0; i < 01024*1024*3; i+= 3) {
-		pixels[i] = red;
-		pixels[i+1] = green;
-		pixels[i+2] = blue;
+
+	for ( int y=centerY-radius; y <= centerY+radius; y++){		
+		for ( int x = centerX-radius; x <= centerX+radius; x++) {	
+			int dist = (int)sqrt((double)((x-centerX)*(x-centerX) + (y-centerY)*(y-centerY)));
+			if (dist <= radius) {
+				pixels[3*(x + y*kTextureSize)] = green;
+				pixels[(3*(x + y*kTextureSize))+1] = blue;
+				pixels[(3*(x + y*kTextureSize))+2] = red;
+			}
+		}
 	}
 }
 
@@ -212,7 +200,7 @@ void CatPicturePart2App::update()
 	drawBackground(dataArray, 100, 200, 10);
 	//drawBackground(dataArray);
 	drawRectangles(dataArray, 250, 250, 300, 500);
-
+	drawCircles(dataArray, 100, 100, 100);
 }
 
 void CatPicturePart2App::draw()
