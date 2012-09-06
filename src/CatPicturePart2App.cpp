@@ -165,7 +165,7 @@ void CatPicturePart2App::drawRectangles(uint8_t* pixels, int x1, int y1, int x2,
 		grad.line++;
 		for ( int x = startx; x <= endx; x++) {
 			if (x >= startx & x <= endx & y >= starty & y <= endy){
-			//Set the Red, Green, Blue values for each pixel
+			//Set the Red, Green, Blue values for each pixell
 				pixels [3* (x+y*kTextureSize)]=(250*(grad.line*x/endx));			
 				pixels [3* (x+y*kTextureSize)+1]=(50*(grad.line*x/endx));			
 				pixels [3* (x+y*kTextureSize)+2]=(75*(grad.line*x/endx));			
@@ -198,9 +198,14 @@ void CatPicturePart2App::drawCircles(uint8_t* pixels, int centerX, int centerY, 
 			int dist = (int)sqrt((double)((x-centerX)*(x-centerX) + (y-centerY)*(y-centerY)));
 			if (dist <= radius) {
 				//I'm using the values I have stored above to be able to change the circle's color
-				pixels[3*(x + y*kTextureSize)] = green;
-				pixels[(3*(x + y*kTextureSize))+1] = blue;
-				pixels[(3*(x + y*kTextureSize))+2] = red;
+				//David Shaw:
+				//Not sure if this was intentional, but a pixel's color info is this: (Red,Green,Blue),
+				//not sure if you had to do it this way to compensate for something or not. I ran your 
+				//code with the changes and didn't notice a difference, so it probably doesn't matter
+				//for what you are doing here.
+				pixels[3*(x + y*kTextureSize)] = red;//green;
+				pixels[(3*(x + y*kTextureSize))+1] = green;//blue;
+				pixels[(3*(x + y*kTextureSize))+2] = blue;//red;
 			}
 		}
 	}
@@ -220,6 +225,7 @@ void CatPicturePart2App::mouseDown( MouseEvent event )
 	c.greenSign = 1;
 	c.blueSign = 1;
 	*/
+	
 
 }
 
